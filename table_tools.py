@@ -33,9 +33,9 @@ class Table(object):
         return cls(d)
 
     def field_names(self):
-        return self._data.keys()
+        return set(self._data.keys())
 
-    def add_field(field_name, vector):
+    def add_field(self, field_name, vector):
         if not len(vector) == self._n_row:
             raise ValueError("Length of vector must be equal to number of rows"
                              " in table.")
