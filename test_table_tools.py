@@ -7,10 +7,15 @@ class testTable(unittest.TestCase):
     def setUp(self):
         self.t1 = Table({'a': [1, 2, 3], 'b': [3, 2, 1]})
         self.t2 = Table({'x': ['a', 'b'], 'y': ['b', 'a']})
+        self.t3 = Table({
+            'a': [0, 0, 2, 2, 1, 1],
+            'b': [1, 2, 1, 2, 1, 2],
+            'c': [2, 1, 2, 1, 2, 1]
+        })
 
     def test_field_names(self):
-        self.assertEquals(self.t1.field_names(), set(['a', 'b']))
-        self.assertEquals(self.t2.field_names(), set(['x', 'y']))
+        self.assertEquals(set(self.t1.field_names()), set(['a', 'b']))
+        self.assertEquals(set(self.t2.field_names()), set(['x', 'y']))
 
     def test_get_column(self):
         self.assertEquals(self.t1['a'], [1, 2, 3])
@@ -44,4 +49,30 @@ class testTable(unittest.TestCase):
     def test_map(self):
         self.assertEquals(self.t1.map(lambda a, b: a*b), [3, 4, 3])
         self.assertEquals(self.t2.map(lambda x, y: x + y), ['ab', 'ba'])
+
+    def test_sort_single_field(self):
+        self.assertEquals(self.t1.sort('a'), self.t1)
+        self.assertEquals(self.t1.sort('b'), 
+                          Table({'a': [3, 2, 1], 'b': [1, 2, 3]}))
+        self.assertEquals(self.t2.sort('x'), self.t2)
+        self.assertEquals(self.t2.sort('y'),
+                          Table({'x': ['b', 'a'], 'y': ['a', 'b']}))
+
+    def test_sort_two_fields(self):
+        self.assertEquals(
+            self.t3.sort('a', 'b'),
+            Table({
+                'a': [0, 0, 1, 1, 2, 2],
+                'b': [1, 2, 1, 2, 1, 2],
+                'c': [2, 1, 2, 1, 2, 1]
+            })
+        )
+        self.assertEquals(
+            self.t3.sort('b', 'a'),
+            Table({
+                'a': [0, 1, 2, 0, 1, 2],
+                'b': [1, 1, 1, 2, 2, 2],
+                'c': [2, 2, 2, 1, 1, 1]
+            })
+        )
 

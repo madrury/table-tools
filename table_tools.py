@@ -32,8 +32,11 @@ class Table(object):
         }
         return cls(d)
 
+    def __eq__(self, other):
+        return self._data == other._data
+
     def field_names(self):
-        return set(self._data.keys())
+        return self._data.keys()
 
     def add_field(self, field_name, vector):
         if not len(vector) == self._n_row:
@@ -75,10 +78,10 @@ class Table(object):
         for row in self:
             yield(f(**row))
 
-    def sort_by_field(self, field_name):
+    def sort(self, *orderands):
         field_names, matrix = self._to_matrix()
-        col_idx = field_names.index(field_name)
-        sorted_matrix = sorted(matrix, key=itemgetter(col_idx))
+        col_idxs = [field_names.index(f) for f in orderands]
+        sorted_matrix = sorted(matrix, key=itemgetter(*col_idxs))
         return Table.from_matrix(field_names, sorted_matrix)
 
     def _to_matrix(self):
