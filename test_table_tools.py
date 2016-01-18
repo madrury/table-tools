@@ -32,3 +32,16 @@ class testTable(unittest.TestCase):
         self.assertEquals(self.t1[0:], {'a': [1, 2, 3], 'b': [3, 2, 1]})
         self.assertEquals(self.t1[1:], {'a': [2, 3], 'b': [2, 1]})
         self.assertEquals(self.t1[:2], {'a': [1, 2], 'b': [3, 2]})
+
+    def test_map_across_field(self):
+        self.assertEquals(self.t1.map_across_field('a', lambda x: 2*x),
+                          [2, 4, 6])
+        self.assertEquals(self.t1.map_across_field('b', lambda x: 2*x),
+                          [6, 4, 2])
+        self.assertEquals(self.t1.map_across_field('a', lambda x: 0),
+                          [0, 0, 0])
+
+    def test_map(self):
+        self.assertEquals(self.t1.map(lambda a, b: a*b), [3, 4, 3])
+        self.assertEquals(self.t2.map(lambda x, y: x + y), ['ab', 'ba'])
+
