@@ -1,5 +1,4 @@
 import unittest
-
 from table_tools import Table
 
 class testTable(unittest.TestCase):

@@ -1,10 +1,28 @@
 from pprint import pformat
 from operator import itemgetter
+from itertools import groupby
 
+# I want to support things like this
+#
+# t.sort('x', 'y').groupby('x').first()
+# t.sort('x', 'y').groupby('x').lag(1).first()
 
 def _check_lengths(d):
     check_len = len(d[d.keys()[0]])
     return all(len(val) == check_len for val in d.itervalues())
+
+def _accumulate(iterable):
+    total = 0
+    for e in iterable:
+        total += e
+        yield total
+
+def _get_transition_slices(lst):
+    group_lengths = (len(list(grp)) for elem, grp in groupby(lst))
+    slice_ends = list(_accumulate(group_lengths))
+    slice_begins = [0] + slice_ends[:-1]
+    return [slice(i, j) for i, j in zip(slice_begins, slice_ends)]
+    
 
 class Table(object):
 
@@ -45,7 +63,7 @@ class Table(object):
         self._data[field_name] = vector
 
     def __repr__(self):
-        return pformat(self._data)
+        return  'Table(' + pformat(self._data) + ')'
 
     def __getitem__(self, idxr):
         if isinstance(idxr, basestring):
@@ -92,11 +110,21 @@ class Table(object):
         ]
         return field_names, matrix
 
-    def groupby(self, field, mapper=None):
-        if mapper == None:
-            mapper = lambda x: x
-        pass
-
+    def groupby(self, field_name):
+        field = self[field_name]
+        slices = _get_transition_slices(field)
+        tables = []
+        for sl in slices:
+            tables.append(self[sl])
+        return TableGrouped(tables)
+        
 
 class TableGrouped(object):
-   pass
+
+    def __init__(self, array_of_tables):
+        self._data = array_of_tables
+        self._offset = 0
+
+    def __repr__(self):
+        return self._data.__repr__()
+
