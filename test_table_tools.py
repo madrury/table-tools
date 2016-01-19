@@ -11,6 +11,11 @@ class testTable(unittest.TestCase):
             'b': [1, 2, 1, 2, 1, 2],
             'c': [2, 1, 2, 1, 2, 1]
         })
+        self.t4 = Table({
+            'a': [0, 0, 0, 1, 2, 2],
+            'b': [1, 2, 1, 2, 1, 2],
+            'c': [2, 1, 2, 1, 2, 1]
+        })
 
     def test_field_names(self):
         self.assertEquals(set(self.t1.field_names()), set(['a', 'b']))
@@ -96,5 +101,16 @@ class testTable(unittest.TestCase):
             )
         )
                     
-
-
+    def test_reduce(self):
+        self.assertEquals(
+            self.t3.groupby('a').reduce(lambda x: min(x['b'])),
+            [1, 1, 1, 1, 1, 1]
+        )
+        self.assertEquals(
+            self.t3.groupby('a').reduce(lambda x: min(x['b'])),
+            [1, 1, 1, 1, 1, 1]
+        )
+        self.assertEquals(
+            self.t4.groupby('a').reduce(lambda x: sum(x['b'])),
+            [4, 4, 4, 2, 3, 3]
+        )
