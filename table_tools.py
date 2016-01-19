@@ -162,3 +162,14 @@ class TableGrouped(object):
                 reduced.extend([f(self[i - self._offset])] * x._n_row)
         return reduced
 
+    def first(self, field_name, default=''):
+        return self.reduce(lambda x: x[field_name][0], default=default)
+
+    def last(self, field_name, default=''):
+        return self.reduce(lambda x: x[field_name][-1], default=default)
+
+    def min(self, field_name, default=''):
+        return self.reduce(lambda x: min(x[field_name]), default=default)
+
+    def max(self, field_name, default=''):
+        return self.reduce(lambda x: min(x[field_name]), default=default)
