@@ -131,6 +131,7 @@ class TableGrouped(object):
 
     def __init__(self, array_of_tables):
         self._data = array_of_tables
+        self._grp_lens = [x._n_row for x in array_of_tables]
         self._offset = 0
 
     def __repr__(self):
@@ -138,4 +139,26 @@ class TableGrouped(object):
 
     def __eq__(self, other):
         return self._data == other._data
+
+    def __iter__(self):
+        for table in self._data:
+            yield table
+
+    def __getitem__(self, idx):
+        return self._data[idx]
+
+    def lag(self, n):
+        if n < 0:
+            raise ValueError("Lag must be non-negative.")
+        self._offset = n
+        return self
+
+    def reduce(self, f, default=''):
+        reduced = []
+        for i, x in enumerate(self):
+            if i < self._offset:
+                reduced.extend([default] * x._n_row)
+            else:
+                reduced.extend([f(self[i - self._offset])] * x._n_row)
+        return reduced
 
