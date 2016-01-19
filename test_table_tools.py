@@ -1,5 +1,5 @@
 import unittest
-from table_tools import Table
+from table_tools import Table, TableGrouped
 
 class testTable(unittest.TestCase):
 
@@ -33,9 +33,9 @@ class testTable(unittest.TestCase):
         self.assertEquals(self.t1[2], {'a': 3, 'b': 1})
 
     def test_get_slice(self):
-        self.assertEquals(self.t1[0:], {'a': [1, 2, 3], 'b': [3, 2, 1]})
-        self.assertEquals(self.t1[1:], {'a': [2, 3], 'b': [2, 1]})
-        self.assertEquals(self.t1[:2], {'a': [1, 2], 'b': [3, 2]})
+        self.assertEquals(self.t1[0:], Table({'a': [1, 2, 3], 'b': [3, 2, 1]}))
+        self.assertEquals(self.t1[1:], Table({'a': [2, 3], 'b': [2, 1]}))
+        self.assertEquals(self.t1[:2], Table({'a': [1, 2], 'b': [3, 2]}))
 
     def test_map_across_field(self):
         self.assertEquals(self.t1.map_across_field('a', lambda x: 2*x),
@@ -74,4 +74,27 @@ class testTable(unittest.TestCase):
                 'c': [2, 2, 2, 1, 1, 1]
             })
         )
+
+    def test_groupby(self):
+        self.assertEquals(
+            self.t3.groupby('a'),
+            TableGrouped(
+                [
+                    Table({'a': [0 ,0], 'b': [1, 2], 'c': [2, 1]}),
+                    Table({'a': [2, 2], 'b': [1, 2], 'c': [2, 1]}),
+                    Table({'a': [1, 1], 'b': [1, 2], 'c': [2, 1]})
+                ]
+            )
+        )
+        self.assertEquals(
+            self.t3.sort('b').groupby('b'),
+            TableGrouped(
+                [
+                    Table({'a': [0, 2, 1], 'b': [1, 1, 1], 'c': [2, 2, 2]}),
+                    Table({'a': [0, 2, 1], 'b': [2, 2, 2], 'c': [1, 1, 1]})
+                ]
+            )
+        )
+                    
+
 

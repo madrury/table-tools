@@ -68,19 +68,27 @@ class Table(object):
     def __getitem__(self, idxr):
         if isinstance(idxr, basestring):
             return self._getitem_string(idxr)
-        elif isinstance(idxr, (int, long, slice)):
-            return self._getitem_int_or_slice(idxr)
+        elif isinstance(idxr, (int, long)):
+            return self._getitem_int(idxr)
+        elif isinstance(idxr, slice):
+            return self._getitem_slice(idxr)
         else:
             raise ValueError("Unknown type supplied to __getitem__")
 
     def _getitem_string(self, key):
         return self._data[key]
 
-    def _getitem_int_or_slice(self, idxr):
+    def _getitem_int(self, idxr):
         return {
             field_name: self[field_name][idxr]
             for field_name in self.field_names()
         }
+
+    def _getitem_slice(self, idxr):
+        return Table({
+            field_name: self[field_name][idxr]
+            for field_name in self.field_names()
+        })
 
     def __iter__(self):
         for i in range(self._n_row):
@@ -127,4 +135,7 @@ class TableGrouped(object):
 
     def __repr__(self):
         return self._data.__repr__()
+
+    def __eq__(self, other):
+        return self._data == other._data
 
