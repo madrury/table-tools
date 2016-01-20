@@ -131,6 +131,7 @@ class TableGrouped(object):
 
     def __init__(self, array_of_tables):
         self._data = array_of_tables
+        self._n_grps = len(array_of_tables)
         self._grp_lens = [x._n_row for x in array_of_tables]
         self._offset = 0
 
@@ -153,10 +154,16 @@ class TableGrouped(object):
         self._offset = n
         return self
 
+    def develop(self, n):
+        if n < 0:
+            raise ValueError("Develop must be non-negative.")
+        self._offset = -n
+        return self
+
     def reduce(self, f, default=''):
         reduced = []
         for i, x in enumerate(self):
-            if i < self._offset:
+            if i < self._offset or i >= self._n_grps + self._offset: 
                 reduced.extend([default] * x._n_row)
             else:
                 reduced.extend([f(self[i - self._offset])] * x._n_row)
